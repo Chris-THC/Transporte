@@ -1,7 +1,57 @@
-package transporte;
+package org.transporte;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Interfaz funcional que define la capacidad de un objeto para rodar.
+ */
+interface Rodante {
+    /**
+     * Método que simula la acción de conducir.
+     */
+    void conducir();
+}
+
+/**
+ * Interfaz funcional que define la capacidad de un Vehiculo para volar.
+ */
+interface Volador {
+    /**
+     * Método que simula la acción de volar.
+     */
+    void volar();
+}
+
+/**
+ * Interfaz funcional que define la capacidad de un Vehiculo para nadar o navegar.
+ */
+interface Nadador {
+    /**
+     * Método que simula la acción de navegar.
+     */
+    void navegar();
+}
+
+/**
+ * Interfaz funcional que define la capacidad de un Vehiculo para recargar su batería.
+ */
+interface Electrico {
+    /**
+     * Método que simula la acción de recargar la batería.
+     */
+    void recargarBateria();
+}
+
+/**
+ * Interfaz funcional que define la capacidad de un Vehiculo para repostar combustible.
+ */
+interface Combustion {
+    /**
+     * Método que simula la acción de repostar combustible.
+     */
+    void recargarCombustible();
+}
 
 /**
  * Clase principal que encapsula toda la simulación del sistema de transporte autónomo.
@@ -16,68 +66,6 @@ import java.util.List;
  * @version 1.0
  */
 public class Simulador {
-
-    /**
-     * Interfaz funcional que define la capacidad de un objeto para rodar.
-     */
-    public interface Rodante {
-        /**
-         * Método que simula la acción de conducir.
-         */
-        void conducir();
-    }
-
-    /**
-     * Interfaz funcional que define la capacidad de un Vehiculo para volar.
-     */
-    public interface Volador {
-        /**
-         * Método que simula la acción de volar.
-         */
-        void volar();
-    }
-
-    /**
-     * Interfaz funcional que define la capacidad de un Vehiculo para nadar o navegar.
-     */
-    public interface Nadador {
-        /**
-         * Método que simula la acción de navegar.
-         */
-        void navegar();
-    }
-
-    /**
-     * Interfaz funcional que define la capacidad de un Vehiculo para recargar su batería.
-     */
-    public interface Electrico {
-        /**
-         * Método que simula la acción de recargar la batería.
-         */
-        void recargarBateria();
-    }
-
-    /**
-     * Interfaz funcional que define la capacidad de un Vehiculo para repostar combustible.
-     */
-    public interface Combustion {
-        /**
-         * Método que simula la acción de repostar combustible.
-         */
-        void repostarCombustible();
-    }
-
-    /**
-     * Interfaz funcional que define la capacidad de un Vehiculo para activar el modo autónomo.
-     */
-    public interface Autonomo {
-        /**
-         * Método que simula la acción de activar el modo autónomo.
-         */
-        void activarModoAutonomo();
-    }
-
-
     /**
      * Clase abstracta que representa un vehículo autónomo genérico.
      * Proporciona una base para diferentes tipos de vehículos con atributos y comportamientos comunes.
@@ -230,7 +218,7 @@ public class Simulador {
              * Simula la acción de repostar gasolina en el auto.
              */
             @Override
-            public void repostarCombustible() {
+            public void recargarCombustible() {
                 System.out.println("Auto repostando gasolina.");
             }
         }
@@ -239,7 +227,7 @@ public class Simulador {
         /**
          * Vehículo aéreo autónomo con capacidades eléctricas.
          */
-        public static class Dron extends Vehiculo implements Volador, Electrico, Autonomo {
+        public static class Dron extends Vehiculo implements Volador, Electrico {
             /**
              * Constructor para la clase {@code Dron}.
              * Inicializa un nuevo dron con un ID específico y valores predeterminados para capacidad y ubicación.
@@ -295,14 +283,6 @@ public class Simulador {
                 System.out.println("Batería de ion-litio recargándose.");
             }
 
-            /**
-             * Implementación del método de la interfaz {@code Autonomo}.
-             * Simula la activación de la navegación por GPS del dron.
-             */
-            @Override
-            public void activarModoAutonomo() {
-                System.out.println("Dron activando navegación por GPS.");
-            }
         }
 
         /**
@@ -421,62 +401,6 @@ public class Simulador {
 
 
     /**
-     * Clase abstracta que representa una carga genérica.
-     * Define propiedades y comportamientos comunes para diferentes tipos de carga.
-     */
-    public static abstract class Carga {
-        private double peso;
-
-        /**
-         * Método abstracto que define la acción de verificar la seguridad de la carga.
-         * Cada subclase concreta debe implementar este método para especificar cómo se verifica la seguridad.
-         */
-        public abstract void verificarSeguridad();
-
-        /**
-         * Obtiene el peso de la carga.
-         *
-         * @return El peso de la carga.
-         */
-        public double getPeso() {
-            return peso;
-        }
-
-        /**
-         * Establece el peso de la carga.
-         *
-         * @param peso El nuevo peso de la carga.
-         */
-        public void setPeso(double peso) {
-            this.peso = peso;
-        }
-    }
-
-    /**
-     * Carga especializada para materiales frágiles.
-     */
-    public static class CargaFragil extends Carga {
-        /**
-         * Implementación del método abstracto {@code verificarSeguridad()} para la clase {@code CargaFragil}.
-         * Simula la aplicación de protocolos anti-vibración para asegurar la carga frágil.
-         */
-        @Override
-        public void verificarSeguridad() {
-            System.out.println("Aplicando protocolos anti-vibración.");
-        }
-
-        /**
-         * Sobreescribe el método {@code toString()} para proporcionar una representación en cadena de la carga frágil.
-         *
-         * @return Una cadena que describe la carga como "Carga Frágil".
-         */
-        @Override
-        public String toString() {
-            return "Carga Frágil";
-        }
-    }
-
-    /**
      * Clase abstracta que representa una misión logística.
      * Define los atributos y comportamientos básicos de una misión de transporte.
      */
@@ -511,44 +435,6 @@ public class Simulador {
          */
         public void completar() {
             System.out.println("Misión completada en " + destino);
-        }
-    }
-
-    /**
-     * Misión especializada para entregas urgentes.
-     * Extiende la clase {@code Mision} añadiendo un tiempo límite para la entrega.
-     */
-    public static class EntregaUrgente extends Mision {
-        private double tiempoLimite;
-
-        /**
-         * Constructor para la clase {@code EntregaUrgente}.
-         *
-         * @param origen       El punto de origen de la entrega urgente.
-         * @param destino      El punto de destino de la entrega urgente.
-         * @param vehiculo     El vehículo asignado para la entrega urgente.
-         * @param tiempoLimite El tiempo límite en horas para completar la entrega.
-         */
-        public EntregaUrgente(String origen, String destino, Vehiculo vehiculo, double tiempoLimite) {
-            super(origen, destino, vehiculo);
-            this.tiempoLimite = tiempoLimite;
-        }
-
-        /**
-         * Sobreescribe el método {@code iniciar()} para mostrar un mensaje específico para entregas urgentes.
-         */
-        @Override
-        public void iniciar() {
-            System.out.printf("INICIO URGENTE: " + origen + " a " + destino + " (" +vehiculoAsignado.getId()+")");
-            vehiculoAsignado.moverse();
-        }
-
-        /**
-         * Sobreescribe el método {@code completar()} para indicar que la entrega se completó dentro del tiempo límite.
-         */
-        @Override
-        public void completar() {
-            System.out.println("Entrega completada en " + tiempoLimite + " horas.");
         }
     }
 
@@ -636,13 +522,13 @@ public class Simulador {
         System.out.println("\n--- Demostración de Downcasting ---");
         if (vehiculoGenerico1 instanceof Vehiculo.Auto) {
             Vehiculo.Auto autoRecuperado = (Vehiculo.Auto) vehiculoGenerico1;
-            autoRecuperado.repostarCombustible();
+            autoRecuperado.recargarCombustible();
         }
 
         if (vehiculoGenerico2 instanceof Vehiculo.Dron) {
             Vehiculo.Dron dronRecuperado = (Vehiculo.Dron) vehiculoGenerico2;
             dronRecuperado.volar();
-            dronRecuperado.activarModoAutonomo();
+            dronRecuperado.moverse();
         }
 
         // Uso de interfaces (Polimorfismo)
@@ -675,15 +561,10 @@ public class Simulador {
         entornoSimulacion.agregarVehiculo(anfibio1);
         entornoSimulacion.agregarVehiculo(submarino1);
 
-        CargaFragil carga1 = new CargaFragil();
-        carga1.setPeso(2.5);
-        carga1.verificarSeguridad();
 
         Mision mision1 = new Mision("Orizaba", "CDMX", auto1);
-        EntregaUrgente mision2 = new EntregaUrgente("USA", "Inglaterra", submarino1, 10.0);
 
         entornoSimulacion.agregarMision(mision1);
-        entornoSimulacion.agregarMision(mision2);
 
         entornoSimulacion.simularCiclo();
     }
