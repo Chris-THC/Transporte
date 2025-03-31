@@ -285,6 +285,7 @@ public class Simulador {
 
         }
 
+
         /**
          * Vehículo anfibio con capacidades terrestres y acuáticas.
          */
@@ -569,3 +570,4 @@ public class Simulador {
         entornoSimulacion.simularCiclo();
     }
 }
+//borrar luego
