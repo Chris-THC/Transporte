@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Interfaz funcional que define la capacidad de un objeto para rodar.
@@ -414,11 +415,6 @@ public class Simulador {
         protected double pesoCarga; // Peso de la carga
         protected boolean completada;
 
-
-
-
-
-
         /**
          * Constructor para la clase {@code Mision}.
          *
@@ -434,16 +430,6 @@ public class Simulador {
             this.completada = false;
 
         }
-
-        public boolean validarVehiculo() {
-            // Usar la capacidad actual como capacidad máxima
-            if (pesoCarga > vehiculoAsignado.getCapacidad()) {
-                System.out.println("Error: El peso de la carga excede la capacidad máxima del vehículo.");
-                return false;
-            }
-            return true;
-        }
-
 
         /**
          * Inicia la misión, mostrando un mensaje y haciendo que el vehículo asignado se mueva.
@@ -465,7 +451,6 @@ public class Simulador {
         }
 
     }
-
 
     /**
      * Entorno que gestiona una colección de vehículos y misiones activas.
@@ -496,12 +481,12 @@ public class Simulador {
         /**
          * Simula un ciclo de operaciones, iniciando y completando todas las misiones activas.
          */
-        public void simularCiclo() {
+        public void simularCiclo(Simulador.Mision misionSeleccionada) {
             System.out.println("\n--- INICIO DE CICLO DE SIMULACIÓN ---");
             misiones.forEach(m -> {
                 System.out.println("Detalles de la misión:");
                 System.out.println("Origen: " + m.origen + ", Destino: " + m.destino);
-                System.out.println("Vehículo asignado: " + m.vehiculoAsignado.getClass().getSimpleName());
+                System.out.println("Vehículo asignado: " + m.vehiculoAsignado.getClass().getSimpleName()+" " + m.vehiculoAsignado.getId());
                 System.out.println("Capacidad de carga: " + m.vehiculoAsignado.getCapacidad());
                 simularObstaculos(m.vehiculoAsignado); // Llamamos al método de esta clase
                 m.iniciar();
@@ -604,10 +589,43 @@ public class Simulador {
                             break;
                         case 4:
                             System.out.println("Misiones activas:");
-                            entorno.misiones.forEach(m -> System.out.println(m.origen + " -> " + m.destino + " (Vehículo: " + m.vehiculoAsignado.getId() + ")"));
+                            entorno.misiones.stream()
+                                    .filter(m -> !m.isCompletada()) // Filtrar solo misiones no completadas
+                                    .forEach(m -> System.out.println(m.origen + " -> " + m.destino + " (Vehículo: " + m.vehiculoAsignado.getId() + ")"));
                             break;
                         case 5:
-                            entorno.simularCiclo();
+                           // entorno.simularCiclo();
+
+                            // Filtrar misiones activas
+                            List<Simulador.Mision> misionesActivas = entorno.misiones.stream()
+                                    .filter(m -> !m.isCompletada()) // Solo misiones no completadas
+                                    .collect(Collectors.toList());
+
+                            if (misionesActivas.isEmpty()) {
+                                System.out.println("No hay misiones activas para simular.");
+                                break;
+                            }
+
+                            System.out.println("Misiones activas disponibles:");
+                            for (int i = 0; i < misionesActivas.size(); i++) {
+                                Simulador.Mision mision = misionesActivas.get(i);
+                                System.out.println((i + 1) + ". Origen: " + mision.origen + ", Destino: " + mision.destino +
+                                        " (Vehículo: " + mision.vehiculoAsignado.getId() + ")");
+                            }
+
+                            // Solicitar al usuario que seleccione una misión
+                            System.out.print("Selecciona el número de la misión que deseas simular: ");
+                            int seleccion = scanner.nextInt();
+
+                            // Validar la selección
+                            if (seleccion < 1 || seleccion > misionesActivas.size()) {
+                                System.out.println("Selección inválida. Regresando al menú principal.");
+                                break;
+                            }
+
+                            // Obtener la misión seleccionada y simularla
+                            Simulador.Mision misionSeleccionada = misionesActivas.get(seleccion - 1);
+                            //simular(misionSeleccionada); // Pasamos la misión como parámetro
                             break;
                         case 6:
                             System.out.print("ID del vehículo a consultar: ");
