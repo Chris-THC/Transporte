@@ -2,6 +2,8 @@ package org.transporte;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 /**
  * Interfaz funcional que define la capacidad de un objeto para rodar.
@@ -409,6 +411,13 @@ public class Simulador {
         protected String origen;
         protected String destino;
         protected Vehiculo vehiculoAsignado;
+        protected double pesoCarga; // Peso de la carga
+        protected boolean completada;
+
+
+
+
+
 
         /**
          * Constructor para la clase {@code Mision}.
@@ -421,7 +430,20 @@ public class Simulador {
             this.origen = origen;
             this.destino = destino;
             this.vehiculoAsignado = vehiculoAsignado;
+            this.pesoCarga = pesoCarga;
+            this.completada = false;
+
         }
+
+        public boolean validarVehiculo() {
+            // Usar la capacidad actual como capacidad máxima
+            if (pesoCarga > vehiculoAsignado.getCapacidad()) {
+                System.out.println("Error: El peso de la carga excede la capacidad máxima del vehículo.");
+                return false;
+            }
+            return true;
+        }
+
 
         /**
          * Inicia la misión, mostrando un mensaje y haciendo que el vehículo asignado se mueva.
@@ -436,7 +458,12 @@ public class Simulador {
          */
         public void completar() {
             System.out.println("Misión completada en " + destino);
+            completada = true;
         }
+        public boolean isCompletada() {
+            return completada;
+        }
+
     }
 
 
@@ -472,11 +499,35 @@ public class Simulador {
         public void simularCiclo() {
             System.out.println("\n--- INICIO DE CICLO DE SIMULACIÓN ---");
             misiones.forEach(m -> {
+                System.out.println("Detalles de la misión:");
+                System.out.println("Origen: " + m.origen + ", Destino: " + m.destino);
+                System.out.println("Vehículo asignado: " + m.vehiculoAsignado.getClass().getSimpleName());
+                System.out.println("Capacidad de carga: " + m.vehiculoAsignado.getCapacidad());
+                simularObstaculos(m.vehiculoAsignado); // Llamamos al método de esta clase
                 m.iniciar();
                 m.completar();
             });
             System.out.println("--- FIN DE CICLO ---\n");
+
         }
+        public static void simularObstaculos(Vehiculo vehiculo) {
+            Random random = new Random();
+
+            if (vehiculo instanceof Vehiculo.Auto || vehiculo instanceof Vehiculo.Anfibio) {
+                System.out.println("Obstáculos terrestres:");
+                String[] obstaculosTerrestres = {"Tráfico intenso", "Carretera en mal estado", "Accidente en la ruta"};
+                System.out.println("- " + obstaculosTerrestres[random.nextInt(obstaculosTerrestres.length)]);
+            } else if (vehiculo instanceof Vehiculo.Dron) {
+                System.out.println("Obstáculos aéreos:");
+                String[] obstaculosAereos = {"Viento fuerte", "Baja visibilidad", "Interferencia con señal"};
+                System.out.println("- " + obstaculosAereos[random.nextInt(obstaculosAereos.length)]);
+            } else if (vehiculo instanceof Vehiculo.Submarino || vehiculo instanceof Vehiculo.Anfibio) {
+                System.out.println("Obstáculos acuáticos:");
+                String[] obstaculosAcuaticos = {"Corrientes fuertes", "Baja visibilidad submarina", "Obstrucción por rocas"};
+                System.out.println("- " + obstaculosAcuaticos[random.nextInt(obstaculosAcuaticos.length)]);
+            }
+        }
+
     }
 
     /**
@@ -484,90 +535,108 @@ public class Simulador {
      * Crea instancias de diferentes vehículos, realiza operaciones de polimorfismo y demuestra el funcionamiento del entorno de simulación y las misiones.
      */
     public static void main(String[] args) {
-        // Creación de vehículos concretos (Tipificación)
-        Vehiculo.Auto auto1 = new Vehiculo.Auto("A1");
-        Vehiculo.Dron dron1 = new Vehiculo.Dron("D1");
-        Vehiculo.Anfibio anfibio1 = new Vehiculo.Anfibio("AN1");
-        Vehiculo.Submarino submarino1 = new Vehiculo.Submarino("S1");
 
-        System.out.println("--- Demostración de Tipificación ---");
-        System.out.println("Tipo de auto1: " + auto1.getClass().getSimpleName());
-        System.out.println("Tipo de dron1: " + dron1.getClass().getSimpleName());
+            Scanner scanner = new Scanner(System.in);
+                Simulador.Entorno entorno = new Simulador.Entorno();
+                int opcion;
 
-        // Upcasting (Polimorfismo)
-        Vehiculo vehiculoGenerico1 = auto1; // Un Auto es un Vehiculo
-        Vehiculo vehiculoGenerico2 = dron1; // Un Dron es un Vehiculo
-        Rodante vehiculoRodante = anfibio1; // Un Anfibio es Rodante
-        Nadador vehiculoNadador = submarino1; // Un Submarino es Nadador
+                do {
+                    System.out.println("========= MENÚ PRINCIPAL =========");
+                    System.out.println("1. Registrar un nuevo vehículo");
+                    System.out.println("2. Listar todos los vehículos registrados");
+                    System.out.println("3. Crear una nueva misión");
+                    System.out.println("4. Listar todas las misiones activas");
+                    System.out.println("5. Iniciar ciclo de simulación");
+                    System.out.println("6. Ver detalles de un vehículo específico");
+                    System.out.println("7. Salir");
+                    System.out.println("==================================");
+                    System.out.print("Selecciona una opción: ");
+                    opcion = scanner.nextInt();
 
-        System.out.println("\n--- Demostración de Upcasting y Polimorfismo ---");
-        vehiculoGenerico1.moverse(); // Llama a la implementación de moverse de Auto
-        vehiculoGenerico2.moverse(); // Llama a la implementación de moverse de Dron
-        vehiculoRodante.conducir(); // Llama a la implementación de conducir de Anfibio
-        vehiculoNadador.navegar(); // Llama a la implementación de navegar de Submarino
+                    switch (opcion) {
+                        case 1:
+                            System.out.println("Registrar vehículo - Selecciona tipo:");
+                            System.out.println("1. Auto");
+                            System.out.println("2. Dron");
+                            System.out.println("3. Anfibio");
+                            System.out.println("4. Submarino");
+                            System.out.print("Opción: ");
+                            int tipoVehiculo = scanner.nextInt();
+                            System.out.print("ID del vehículo: ");
+                            String id = scanner.next();
+                            if (tipoVehiculo == 1) {
+                                entorno.agregarVehiculo(new Simulador.Vehiculo.Auto(id));
+                                System.out.println("Auto registrado exitosamente.");
+                            } else if (tipoVehiculo == 2) {
+                                entorno.agregarVehiculo(new Simulador.Vehiculo.Dron(id));
+                                System.out.println("Dron registrado exitosamente.");
+                            } else if (tipoVehiculo == 3) {
+                                entorno.agregarVehiculo(new Simulador.Vehiculo.Anfibio(id));
+                                System.out.println("Anfibio registrado exitosamente.");
+                            } else if (tipoVehiculo == 4) {
+                                entorno.agregarVehiculo(new Simulador.Vehiculo.Submarino(id));
+                                System.out.println("Submarino registrado exitosamente.");
+                            } else {
+                                System.out.println("Opción inválida. No se ha registrado ningún vehículo.");
+                            }
+                            break;
+                        case 2:
+                            System.out.println("Vehículos registrados:");
+                            entorno.vehiculos.forEach(v -> System.out.println(v.getId() + " (" + v.getClass().getSimpleName() + ")"));
+                            break;
+                        case 3:
+                            System.out.print("Origen de la misión: ");
+                            String origen = scanner.next();
+                            System.out.print("Destino de la misión: ");
+                            String destino = scanner.next();
+                            System.out.print("ID del vehículo asignado: ");
+                            String idVehiculo = scanner.next();
+                            Simulador.Vehiculo vehiculoAsignado = entorno.vehiculos.stream()
+                                    .filter(v -> v.getId().equals(idVehiculo))
+                                    .findFirst().orElse(null);
+                            if (vehiculoAsignado != null) {
+                                entorno.agregarMision(new Simulador.Mision(origen, destino, vehiculoAsignado));
+                            } else {
+                                System.out.println("Vehículo no encontrado.");
+                            }
 
-        // Polimorfismo a través de una lista
-        List<Vehiculo> flota = new ArrayList<>();
-        flota.add(auto1);
-        flota.add(dron1);
-        flota.add(anfibio1);
-        flota.add(submarino1);
 
-        System.out.println("\n--- Polimorfismo en una lista ---");
-        for (Vehiculo vehiculo : flota) {
-            System.out.print(vehiculo.getId() + ": ");
-            vehiculo.moverse(); // Comportamiento polimórfico: cada vehículo se mueve de forma diferente
+                            break;
+                        case 4:
+                            System.out.println("Misiones activas:");
+                            entorno.misiones.forEach(m -> System.out.println(m.origen + " -> " + m.destino + " (Vehículo: " + m.vehiculoAsignado.getId() + ")"));
+                            break;
+                        case 5:
+                            entorno.simularCiclo();
+                            break;
+                        case 6:
+                            System.out.print("ID del vehículo a consultar: ");
+                            String idConsulta = scanner.next();
+                            Simulador.Vehiculo vehiculoConsultado = entorno.vehiculos.stream()
+                                    .filter(v -> v.getId().equals(idConsulta))
+                                    .findFirst().orElse(null);
+                            if (vehiculoConsultado != null) {
+                                System.out.println("Detalles del vehículo:");
+                                System.out.println("ID: " + vehiculoConsultado.getId());
+                                System.out.println("Capacidad: " + vehiculoConsultado.getCapacidad());
+                                System.out.println("Ubicación: " + vehiculoConsultado.getUbicacion());
+                            } else {
+                                System.out.println("Vehículo no encontrado.");
+                            }
+                            break;
+                        case 7:
+                            System.out.println("Saliendo...");
+                            break;
+                        default:
+                            System.out.println("Opción no válida.");
+                    }
+                } while (opcion != 7);
+
+                scanner.close();
+            }
         }
 
-        // Downcasting (requiere precaución y verificación con instanceof)
-        System.out.println("\n--- Demostración de Downcasting ---");
-        if (vehiculoGenerico1 instanceof Vehiculo.Auto) {
-            Vehiculo.Auto autoRecuperado = (Vehiculo.Auto) vehiculoGenerico1;
-            autoRecuperado.recargarCombustible();
-        }
-
-        if (vehiculoGenerico2 instanceof Vehiculo.Dron) {
-            Vehiculo.Dron dronRecuperado = (Vehiculo.Dron) vehiculoGenerico2;
-            dronRecuperado.volar();
-            dronRecuperado.moverse();
-        }
-
-        // Uso de interfaces (Polimorfismo)
-        System.out.println("\n--- Polimorfismo con Interfaces ---");
-        List<Rodante> vehiculosTerrestres = new ArrayList<>();
-        vehiculosTerrestres.add(auto1);
-        vehiculosTerrestres.add(anfibio1);
-        for (Rodante rodante : vehiculosTerrestres) {
-            rodante.conducir();
-        }
-
-        List<Volador> vehiculosAereos = new ArrayList<>();
-        vehiculosAereos.add(dron1);
-        for (Volador volador : vehiculosAereos) {
-            volador.volar();
-        }
-
-        List<Nadador> vehiculosAcuaticos = new ArrayList<>();
-        vehiculosAcuaticos.add(submarino1);
-        vehiculosAcuaticos.add(anfibio1);
-        for (Nadador nadador : vehiculosAcuaticos) {
-            nadador.navegar();
-        }
-
-        // Demostración de la clase Entorno y Misiones
-        System.out.println("\n--- Demostración de Entorno y Misiones ---");
-        Entorno entornoSimulacion = new Entorno();
-        entornoSimulacion.agregarVehiculo(auto1);
-        entornoSimulacion.agregarVehiculo(dron1);
-        entornoSimulacion.agregarVehiculo(anfibio1);
-        entornoSimulacion.agregarVehiculo(submarino1);
 
 
-        Mision mision1 = new Mision("Orizaba", "CDMX", auto1);
 
-        entornoSimulacion.agregarMision(mision1);
-
-        entornoSimulacion.simularCiclo();
-    }
-}
 //borrar luego
