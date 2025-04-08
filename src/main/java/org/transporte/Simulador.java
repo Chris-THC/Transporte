@@ -1,5 +1,7 @@
 package org.transporte;
 
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -73,23 +75,14 @@ public class Simulador {
      * Clase abstracta que representa un vehículo autónomo genérico.
      * Proporciona una base para diferentes tipos de vehículos con atributos y comportamientos comunes.
      */
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
     public static abstract class Vehiculo {
         private String id;
         private double capacidad;
         private String ubicacion;
-
-        /**
-         * Constructor para la clase abstracta {@code Vehiculo}.
-         *
-         * @param id        Identificador único del vehículo.
-         * @param capacidad Capacidad de carga del vehículo.
-         * @param ubicacion Ubicación actual del vehículo.
-         */
-        public Vehiculo(String id, double capacidad, String ubicacion) {
-            this.id = id;
-            this.capacidad = capacidad;
-            this.ubicacion = ubicacion;
-        }
 
         /**
          * Método abstracto que define el comportamiento de movimiento del vehículo.
@@ -109,59 +102,6 @@ public class Simulador {
          */
         public abstract void descargar();
 
-        /**
-         * Obtiene el identificador único del vehículo.
-         *
-         * @return El ID del vehículo.
-         */
-        public String getId() {
-            return id;
-        }
-
-        /**
-         * Establece el identificador único del vehículo.
-         *
-         * @param id El nuevo ID del vehículo.
-         */
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        /**
-         * Obtiene la capacidad de carga del vehículo.
-         *
-         * @return La capacidad del vehículo.
-         */
-        public double getCapacidad() {
-            return capacidad;
-        }
-
-        /**
-         * Establece la capacidad de carga del vehículo.
-         *
-         * @param capacidad La nueva capacidad del vehículo.
-         */
-        public void setCapacidad(double capacidad) {
-            this.capacidad = capacidad;
-        }
-
-        /**
-         * Obtiene la ubicación actual del vehículo.
-         *
-         * @return La ubicación del vehículo.
-         */
-        public String getUbicacion() {
-            return ubicacion;
-        }
-
-        /**
-         * Establece la ubicación actual del vehículo.
-         *
-         * @param ubicacion La nueva ubicación del vehículo.
-         */
-        public void setUbicacion(String ubicacion) {
-            this.ubicacion = ubicacion;
-        }
 
         /**
          * Vehículo terrestre que implementa capacidades de rodar y usar combustible.
@@ -362,6 +302,7 @@ public class Simulador {
             public Submarino(String id) {
                 super(id, 2000.0, "Base Submarina");
             }
+
             /**
              * Implementación del método abstracto {@code moverse()} para la clase {@code Submarino}.
              * Simula la acción de sumergirse del submarino a una profundidad de 200 metros.
@@ -379,6 +320,7 @@ public class Simulador {
             public void cargar() {
                 System.out.println("Submarino cargando equipo submarino.");
             }
+
             /**
              * Implementación del método abstracto {@code descargar()} para la clase {@code Submarino}.
              * Simula la acción de liberar carga del submarino con una grúa.
@@ -403,28 +345,18 @@ public class Simulador {
      * Clase abstracta que representa una misión logística.
      * Define los atributos y comportamientos básicos de una misión de transporte.
      */
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    @Builder
     public static class Mision {
         protected String origen;
         protected String destino;
         protected Vehiculo vehiculoAsignado;
         protected double pesoCarga; // Peso de la carga
-        protected boolean completada;
+        protected boolean completada = false;
 
-        /**
-         * Constructor para la clase {@code Mision}.
-         *
-         * @param origen           El punto de origen de la misión.
-         * @param destino          El punto de destino de la misión.
-         * @param vehiculoAsignado El vehículo asignado para realizar la misión.
-         */
-        public Mision(String origen, String destino, Vehiculo vehiculoAsignado) {
-            this.origen = origen;
-            this.destino = destino;
-            this.vehiculoAsignado = vehiculoAsignado;
-            this.pesoCarga = pesoCarga;
-            this.completada = false;
-
-        }
 
         /**
          * Inicia la misión, mostrando un mensaje y haciendo que el vehículo asignado se mueva.
@@ -441,6 +373,7 @@ public class Simulador {
             System.out.println("Misión completada en " + destino);
             completada = true;
         }
+
         public boolean isCompletada() {
             return completada;
         }
@@ -477,34 +410,35 @@ public class Simulador {
          * Simula un ciclo de operaciones, iniciando y completando todas las misiones activas.
          */
         public void simularCiclo(Simulador.Mision misionSeleccionada) {
-                if (misionSeleccionada != null) {
-                    // Simular solo la misión específica seleccionada
-                    System.out.println("\n--- INICIO DE SIMULACIÓN DE MISIÓN ---");
-                    System.out.println("Detalles de la misión:");
-                    System.out.println("Origen: " + misionSeleccionada.origen + ", Destino: " + misionSeleccionada.destino);
-                    System.out.println("Vehículo asignado: " + misionSeleccionada.vehiculoAsignado.getClass().getSimpleName());
-                    System.out.println("Capacidad de carga: " + misionSeleccionada.vehiculoAsignado.getCapacidad());
-                    simularObstaculos(misionSeleccionada.vehiculoAsignado); // Obstáculos específicos
-                    misionSeleccionada.iniciar();
-                    misionSeleccionada.completar(); // Marcar la misión como completada
-                    System.out.println("--- FIN DE SIMULACIÓN DE MISIÓN ---\n");
-                } else {
-                    // Simular todas las misiones activas
-                    System.out.println("\n--- INICIO DE CICLO DE SIMULACIÓN ---");
-                    misiones.stream()
-                            .filter(m -> !m.isCompletada()) // Solo simular misiones no completadas
-                            .forEach(m -> {
-                                System.out.println("Detalles de la misión:");
-                                System.out.println("Origen: " + m.origen + ", Destino: " + m.destino);
-                                System.out.println("Vehículo asignado: " + m.vehiculoAsignado.getClass().getSimpleName());
-                                System.out.println("Capacidad de carga: " + m.vehiculoAsignado.getCapacidad());
-                                simularObstaculos(m.vehiculoAsignado); // Simular obstáculos
-                                m.iniciar();
-                                m.completar(); // Marcar como completada
-                            });
-                    System.out.println("--- FIN DE CICLO ---\n");
-                }
+            if (misionSeleccionada != null) {
+                // Simular solo la misión específica seleccionada
+                System.out.println("\n--- INICIO DE SIMULACIÓN DE MISIÓN ---");
+                System.out.println("Detalles de la misión:");
+                System.out.println("Origen: " + misionSeleccionada.origen + ", Destino: " + misionSeleccionada.destino);
+                System.out.println("Vehículo asignado: " + misionSeleccionada.vehiculoAsignado.getClass().getSimpleName());
+                System.out.println("Capacidad de carga: " + misionSeleccionada.vehiculoAsignado.getCapacidad());
+                simularObstaculos(misionSeleccionada.vehiculoAsignado); // Obstáculos específicos
+                misionSeleccionada.iniciar();
+                misionSeleccionada.completar(); // Marcar la misión como completada
+                System.out.println("--- FIN DE SIMULACIÓN DE MISIÓN ---\n");
+            } else {
+                // Simular todas las misiones activas
+                System.out.println("\n--- INICIO DE CICLO DE SIMULACIÓN ---");
+                misiones.stream()
+                        .filter(m -> !m.isCompletada()) // Solo simular misiones no completadas
+                        .forEach(m -> {
+                            System.out.println("Detalles de la misión:");
+                            System.out.println("Origen: " + m.origen + ", Destino: " + m.destino);
+                            System.out.println("Vehículo asignado: " + m.vehiculoAsignado.getClass().getSimpleName());
+                            System.out.println("Capacidad de carga: " + m.vehiculoAsignado.getCapacidad());
+                            simularObstaculos(m.vehiculoAsignado); // Simular obstáculos
+                            m.iniciar();
+                            m.completar(); // Marcar como completada
+                        });
+                System.out.println("--- FIN DE CICLO ---\n");
+            }
         }
+
         public static void simularObstaculos(Vehiculo vehiculo) {
             Random random = new Random();
 
@@ -531,175 +465,181 @@ public class Simulador {
      */
     public static void main(String[] args) {
 
-            Scanner scanner = new Scanner(System.in);
-                Simulador.Entorno entorno = new Simulador.Entorno();
-                int opcion;
+        Scanner scanner = new Scanner(System.in);
+        Simulador.Entorno entorno = new Simulador.Entorno();
+        int opcion;
 
-                do {
-                    System.out.println("========= MENÚ PRINCIPAL =========");
-                    System.out.println("1. Registrar un nuevo vehículo");
-                    System.out.println("2. Listar todos los vehículos registrados");
-                    System.out.println("3. Crear una nueva misión");
-                    System.out.println("4. Listar todas las misiones activas");
-                    System.out.println("5. Iniciar ciclo de simulación");
-                    System.out.println("6. Ver detalles de un vehículo específico");
-                    System.out.println("7. Salir");
-                    System.out.println("==================================");
-                    System.out.print("Selecciona una opción: ");
-                    opcion = scanner.nextInt();
+        do {
+            System.out.println("========= MENÚ PRINCIPAL =========");
+            System.out.println("1. Registrar un nuevo vehículo");
+            System.out.println("2. Listar todos los vehículos registrados");
+            System.out.println("3. Crear una nueva misión");
+            System.out.println("4. Listar todas las misiones activas");
+            System.out.println("5. Iniciar ciclo de simulación");
+            System.out.println("6. Ver detalles de un vehículo específico");
+            System.out.println("7. Salir");
+            System.out.println("==================================");
+            System.out.print("Selecciona una opción: ");
+            opcion = scanner.nextInt();
 
-                    switch (opcion) {
-                        case 1:
-                            System.out.println("Registrar vehículo - Selecciona tipo:");
-                            System.out.println("1. Auto");
-                            System.out.println("2. Dron");
-                            System.out.println("3. Anfibio");
-                            System.out.println("4. Submarino");
-                            System.out.print("Opción: ");
-                            int tipoVehiculo = scanner.nextInt();
-                            System.out.print("ID del vehículo: ");
-                            String id = scanner.next();
-                            // Verificar si el ID ya está en uso
-                            boolean idEnUso = entorno.vehiculos.stream().anyMatch(v -> v.getId().equals(id));
-                            if (idEnUso) {
-                                System.out.println("Error: El ID '" + id + "' ya está en uso. Por favor, selecciona otro ID.");
-                            } else {
-                                // Registrar el vehículo si el ID no está en uso
-                                if (tipoVehiculo == 1) {
-                                    entorno.agregarVehiculo(new Simulador.Vehiculo.Auto(id));
-                                    System.out.println("Auto registrado exitosamente.");
-                                } else if (tipoVehiculo == 2) {
-                                    entorno.agregarVehiculo(new Simulador.Vehiculo.Dron(id));
-                                    System.out.println("Dron registrado exitosamente.");
-                                } else if (tipoVehiculo == 3) {
-                                    entorno.agregarVehiculo(new Simulador.Vehiculo.Anfibio(id));
-                                    System.out.println("Anfibio registrado exitosamente.");
-                                } else if (tipoVehiculo == 4) {
-                                    entorno.agregarVehiculo(new Simulador.Vehiculo.Submarino(id));
-                                    System.out.println("Submarino registrado exitosamente.");
-                                } else {
-                                    System.out.println("Opción inválida. No se ha registrado ningún vehículo.");
-                                }
-                            }
-                            break;
-                        case 2:
-                            System.out.println("Vehículos registrados:");
-                            entorno.vehiculos.forEach(v -> System.out.println(v.getId() + " (" + v.getClass().getSimpleName() + ")"));
-                            break;
-                        case 3:
-                            System.out.print("Origen de la misión: ");
-                            String origen = scanner.next();
-                            System.out.print("Destino de la misión: ");
-                            String destino = scanner.next();
-                            System.out.println("Selecciona el tipo de misión:");
-                            System.out.println("1. Terrestre");
-                            System.out.println("2. Aérea");
-                            System.out.println("3. Acuática");
-                            System.out.print("Opción: ");
-                            int tipoMision = scanner.nextInt();
-                            System.out.print("ID del vehículo asignado: ");
-                            String idVehiculo = scanner.next();
-
-                            // Buscar el vehículo asignado
-                            Simulador.Vehiculo vehiculoAsignado = entorno.vehiculos.stream()
-                                    .filter(v -> v.getId().equals(idVehiculo))
-                                    .findFirst()
-                                    .orElse(null);
-                            if (vehiculoAsignado == null) {
-                                System.out.println("Vehículo no encontrado.");
-                                break;
-                            }
-                            // Verificar la compatibilidad del vehículo con el tipo de misión
-                            boolean compatible = false;
-                            if (tipoMision == 1 && (vehiculoAsignado instanceof Simulador.Vehiculo.Auto || vehiculoAsignado instanceof Simulador.Vehiculo.Anfibio)) {
-                                compatible = true;
-                            } else if (tipoMision == 2 && vehiculoAsignado instanceof Simulador.Vehiculo.Dron) {
-                                compatible = true;
-                            } else if (tipoMision == 3 && (vehiculoAsignado instanceof Simulador.Vehiculo.Submarino || vehiculoAsignado instanceof Simulador.Vehiculo.Anfibio)) {
-                                compatible = true;
-                            }
-
-                            if (!compatible) {
-                                System.out.println("Error: El vehículo seleccionado no es compatible con el tipo de misión.");
-                            } else {
-                                // Registrar la misión si el vehículo es compatible
-                                Simulador.Mision nuevaMision = new Simulador.Mision(origen, destino, vehiculoAsignado);
-                                entorno.agregarMision(nuevaMision);
-                                System.out.println("Misión registrada exitosamente.");
-                            }
-
-                            break;
-                        case 4:
-                            System.out.println("Misiones activas:");
-                            entorno.misiones.stream()
-                                    .filter(m -> !m.isCompletada()) // Filtrar solo misiones no completadas
-                                    .forEach(m -> System.out.println(m.origen + " -> " + m.destino + " (Vehículo: " + m.vehiculoAsignado.getId() + ")"));
-                            break;
-                        case 5:
-                            // Filtrar las misiones activas
-                            System.out.println("¿Qué deseas hacer?");
-                            System.out.println("1. Simular todas las misiones activas");
-                            System.out.println("2. Simular una misión específica");
-                            System.out.print("Opción: ");
-                            int opcionSimulacion = scanner.nextInt();
-
-                            if (opcionSimulacion == 1) {
-                                // Simular todas las misiones activas
-                                entorno.simularCiclo(null); // Pasamos null para que simule todas
-                            } else if (opcionSimulacion == 2) {
-                                // Filtrar misiones activas
-                                List<Simulador.Mision> misionesActivas = entorno.misiones.stream()
-                                        .filter(m -> !m.isCompletada()) // Solo misiones no completadas
-                                        .collect(Collectors.toList());
-
-                                if (misionesActivas.isEmpty()) {
-                                    System.out.println("No hay misiones activas para simular.");
-                                    break;
-                                }
-                                System.out.println("Misiones activas disponibles:");
-                                for (int i = 0; i < misionesActivas.size(); i++) {
-                                    Simulador.Mision mision = misionesActivas.get(i);
-                                    System.out.println((i + 1) + ". Origen: " + mision.origen + ", Destino: " + mision.destino +
-                                            " (Vehículo: " + mision.vehiculoAsignado.getId() + ")");
-                                }
-                                // Solicitar al usuario que seleccione una misión
-                                System.out.print("Selecciona el número de la misión que deseas simular: ");
-                                int seleccion = scanner.nextInt();
-
-                                if (seleccion < 1 || seleccion > misionesActivas.size()) {
-                                    System.out.println("Selección inválida. Regresando al menú principal.");
-                                    break;
-                                }
-                                // Obtener la misión seleccionada y simularla
-                                Simulador.Mision misionSeleccionada = misionesActivas.get(seleccion - 1);
-                                entorno.simularCiclo(misionSeleccionada); // Pasamos la misión seleccionada
-                            } else {
-                                System.out.println("Opción inválida.");
-                            }
-                            break;
-                        case 6:
-                            System.out.print("ID del vehículo a consultar: ");
-                            String idConsulta = scanner.next();
-                            Simulador.Vehiculo vehiculoConsultado = entorno.vehiculos.stream()
-                                    .filter(v -> v.getId().equals(idConsulta))
-                                    .findFirst().orElse(null);
-                            if (vehiculoConsultado != null) {
-                                System.out.println("Detalles del vehículo:");
-                                System.out.println("ID: " + vehiculoConsultado.getId());
-                                System.out.println("Capacidad: " + vehiculoConsultado.getCapacidad());
-                                System.out.println("Ubicación: " + vehiculoConsultado.getUbicacion());
-                            } else {
-                                System.out.println("Vehículo no encontrado.");
-                            }
-                            break;
-                        case 7:
-                            System.out.println("Saliendo...");
-                            break;
-                        default:
-                            System.out.println("Opción no válida.");
+            switch (opcion) {
+                case 1:
+                    System.out.println("Registrar vehículo - Selecciona tipo:");
+                    System.out.println("1. Auto");
+                    System.out.println("2. Dron");
+                    System.out.println("3. Anfibio");
+                    System.out.println("4. Submarino");
+                    System.out.print("Opción: ");
+                    int tipoVehiculo = scanner.nextInt();
+                    System.out.print("ID del vehículo: ");
+                    String id = scanner.next();
+                    // Verificar si el ID ya está en uso
+                    boolean idEnUso = entorno.vehiculos.stream().anyMatch(v -> v.getId().equals(id));
+                    if (idEnUso) {
+                        System.out.println("Error: El ID '" + id + "' ya está en uso. Por favor, selecciona otro ID.");
+                    } else {
+                        // Registrar el vehículo si el ID no está en uso
+                        if (tipoVehiculo == 1) {
+                            entorno.agregarVehiculo(new Simulador.Vehiculo.Auto(id));
+                            System.out.println("Auto registrado exitosamente.");
+                        } else if (tipoVehiculo == 2) {
+                            entorno.agregarVehiculo(new Simulador.Vehiculo.Dron(id));
+                            System.out.println("Dron registrado exitosamente.");
+                        } else if (tipoVehiculo == 3) {
+                            entorno.agregarVehiculo(new Simulador.Vehiculo.Anfibio(id));
+                            System.out.println("Anfibio registrado exitosamente.");
+                        } else if (tipoVehiculo == 4) {
+                            entorno.agregarVehiculo(new Simulador.Vehiculo.Submarino(id));
+                            System.out.println("Submarino registrado exitosamente.");
+                        } else {
+                            System.out.println("Opción inválida. No se ha registrado ningún vehículo.");
+                        }
                     }
-                } while (opcion != 7);
+                    break;
+                case 2:
+                    System.out.println("Vehículos registrados:");
+                    entorno.vehiculos.forEach(v -> System.out.println(v.getId() + " (" + v.getClass().getSimpleName() + ")"));
+                    break;
+                case 3:
+                    System.out.print("Origen de la misión: ");
+                    String origen = scanner.next();
+                    System.out.print("Destino de la misión: ");
+                    String destino = scanner.next();
+                    System.out.println("Selecciona el tipo de misión:");
+                    System.out.println("1. Terrestre");
+                    System.out.println("2. Aérea");
+                    System.out.println("3. Acuática");
+                    System.out.print("Opción: ");
+                    int tipoMision = scanner.nextInt();
+                    System.out.print("ID del vehículo asignado: ");
+                    String idVehiculo = scanner.next();
 
-                scanner.close();
+                    // Buscar el vehículo asignado
+                    Simulador.Vehiculo vehiculoAsignado = entorno.vehiculos.stream()
+                            .filter(v -> v.getId().equals(idVehiculo))
+                            .findFirst()
+                            .orElse(null);
+                    if (vehiculoAsignado == null) {
+                        System.out.println("Vehículo no encontrado.");
+                        break;
+                    }
+                    // Verificar la compatibilidad del vehículo con el tipo de misión
+                    boolean compatible = false;
+                    if (tipoMision == 1 && (vehiculoAsignado instanceof Simulador.Vehiculo.Auto || vehiculoAsignado instanceof Simulador.Vehiculo.Anfibio)) {
+                        compatible = true;
+                    } else if (tipoMision == 2 && vehiculoAsignado instanceof Simulador.Vehiculo.Dron) {
+                        compatible = true;
+                    } else if (tipoMision == 3 && (vehiculoAsignado instanceof Simulador.Vehiculo.Submarino || vehiculoAsignado instanceof Simulador.Vehiculo.Anfibio)) {
+                        compatible = true;
+                    }
+
+                    if (!compatible) {
+                        System.out.println("Error: El vehículo seleccionado no es compatible con el tipo de misión.");
+                    } else {
+                        // Registrar la misión si el vehículo es compatible
+//                        Simulador.Mision nuevaMision = new Simulador.Mision(origen, destino, vehiculoAsignado);
+                        Simulador.Mision nuevaMision = Simulador.Mision.builder()
+                                .origen(origen)
+                                .destino(destino)
+                                .vehiculoAsignado(vehiculoAsignado)
+                                .pesoCarga(0.0) // opcional si lo necesitas
+                                .build();
+                        entorno.agregarMision(nuevaMision);
+                        System.out.println("Misión registrada exitosamente.");
+                    }
+
+                    break;
+                case 4:
+                    System.out.println("Misiones activas:");
+                    entorno.misiones.stream()
+                            .filter(m -> !m.isCompletada()) // Filtrar solo misiones no completadas
+                            .forEach(m -> System.out.println(m.origen + " -> " + m.destino + " (Vehículo: " + m.vehiculoAsignado.getId() + ")"));
+                    break;
+                case 5:
+                    // Filtrar las misiones activas
+                    System.out.println("¿Qué deseas hacer?");
+                    System.out.println("1. Simular todas las misiones activas");
+                    System.out.println("2. Simular una misión específica");
+                    System.out.print("Opción: ");
+                    int opcionSimulacion = scanner.nextInt();
+
+                    if (opcionSimulacion == 1) {
+                        // Simular todas las misiones activas
+                        entorno.simularCiclo(null); // Pasamos null para que simule todas
+                    } else if (opcionSimulacion == 2) {
+                        // Filtrar misiones activas
+                        List<Simulador.Mision> misionesActivas = entorno.misiones.stream()
+                                .filter(m -> !m.isCompletada()) // Solo misiones no completadas
+                                .collect(Collectors.toList());
+
+                        if (misionesActivas.isEmpty()) {
+                            System.out.println("No hay misiones activas para simular.");
+                            break;
+                        }
+                        System.out.println("Misiones activas disponibles:");
+                        for (int i = 0; i < misionesActivas.size(); i++) {
+                            Simulador.Mision mision = misionesActivas.get(i);
+                            System.out.println((i + 1) + ". Origen: " + mision.origen + ", Destino: " + mision.destino +
+                                    " (Vehículo: " + mision.vehiculoAsignado.getId() + ")");
+                        }
+                        // Solicitar al usuario que seleccione una misión
+                        System.out.print("Selecciona el número de la misión que deseas simular: ");
+                        int seleccion = scanner.nextInt();
+
+                        if (seleccion < 1 || seleccion > misionesActivas.size()) {
+                            System.out.println("Selección inválida. Regresando al menú principal.");
+                            break;
+                        }
+                        // Obtener la misión seleccionada y simularla
+                        Simulador.Mision misionSeleccionada = misionesActivas.get(seleccion - 1);
+                        entorno.simularCiclo(misionSeleccionada); // Pasamos la misión seleccionada
+                    } else {
+                        System.out.println("Opción inválida.");
+                    }
+                    break;
+                case 6:
+                    System.out.print("ID del vehículo a consultar: ");
+                    String idConsulta = scanner.next();
+                    Simulador.Vehiculo vehiculoConsultado = entorno.vehiculos.stream()
+                            .filter(v -> v.getId().equals(idConsulta))
+                            .findFirst().orElse(null);
+                    if (vehiculoConsultado != null) {
+                        System.out.println("Detalles del vehículo:");
+                        System.out.println("ID: " + vehiculoConsultado.getId());
+                        System.out.println("Capacidad: " + vehiculoConsultado.getCapacidad());
+                        System.out.println("Ubicación: " + vehiculoConsultado.getUbicacion());
+                    } else {
+                        System.out.println("Vehículo no encontrado.");
+                    }
+                    break;
+                case 7:
+                    System.out.println("Saliendo...");
+                    break;
+                default:
+                    System.out.println("Opción no válida.");
             }
-        }
+        } while (opcion != 7);
+
+        scanner.close();
+    }
+}
